@@ -1,6 +1,4 @@
-import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
-import 'package:yemek_tarifi/Sayfa1.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 void main() {
@@ -25,57 +23,50 @@ class MyApp extends StatelessWidget {
 }
 
 class MyHomePage extends StatefulWidget {
+  const MyHomePage({super.key});
+
   @override
   State<MyHomePage> createState() => _MyHomePageState();
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  Future<void> veriKaydi() async {
-    var sp = await SharedPreferences.getInstance();
-    sp.setString("ad", "Bora");
-    sp.setInt("yas", 28);
-    sp.setDouble("boy", 1.78);
-    sp.setBool("bekarMi", true);
+  int sayac = 0;
 
-    var arkadasListe = <String>[];
-    arkadasListe.add("Suna");
-    arkadasListe.add("Ali");
-    sp.setStringList("arkadasListe", arkadasListe);
+  Future<void> sayacKontrol() async {
+    var sp = await SharedPreferences.getInstance();
+
+    sayac = sp.getInt("sayac") ?? 0;
+
+    setState(() {
+      sayac = sayac + 1;
+    });
+
+    sp.setInt("sayac", sayac);
+  }
+
+  @override
+  void initState() {
+    sayacKontrol();
+    super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
-    var ekranBilgisi = MediaQuery.of(context);
-    final double ekranYuksekligi = ekranBilgisi.size.height;
-    final double ekranGenisligi = ekranBilgisi.size.height;
-
     return Scaffold(
       appBar: AppBar(
-        title: Text("Anasayfa"),
-        leading: IconButton(
-          onPressed: () {
-            print("deneme");
-            Navigator.push(
-                context, MaterialPageRoute(builder: (context) => MyApp()));
-          },
-          icon: Icon(Icons.home),
-        ),
+        title: Text("Deneme"),
       ),
       body: Center(
-          child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          ElevatedButton(
-              onPressed: () {
-                veriKaydi();
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => SayfaA()),
-                );
-              },
-              child: Text("geçiş yap"))
-        ],
-      )),
+        child: Column(
+          children: <Widget>[
+            Text(
+              "Açılış Sayısı : $sayac",
+              style: TextStyle(fontSize: 50),
+            )
+          ],
+          mainAxisAlignment: MainAxisAlignment.center,
+        ),
+      ),
     );
   }
 }
