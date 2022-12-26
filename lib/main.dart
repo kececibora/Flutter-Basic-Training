@@ -1,5 +1,7 @@
-import 'package:flutter/foundation.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:yemek_tarifi/Sayfa1.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 void main() {
   runApp(const MyApp());
@@ -12,26 +14,35 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Demo',
+      title: 'Flutter Training',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
         primarySwatch: Colors.amber,
       ),
-      home: const MyHomePage(title: 'Yemek Tarifi'),
+      home: MyHomePage(),
     );
   }
 }
 
 class MyHomePage extends StatefulWidget {
-  const MyHomePage({super.key, required this.title});
-
-  final String title;
-
   @override
   State<MyHomePage> createState() => _MyHomePageState();
 }
 
 class _MyHomePageState extends State<MyHomePage> {
+  Future<void> veriKaydi() async {
+    var sp = await SharedPreferences.getInstance();
+    sp.setString("ad", "Bora");
+    sp.setInt("yas", 28);
+    sp.setDouble("boy", 1.78);
+    sp.setBool("bekarMi", true);
+
+    var arkadasListe = <String>[];
+    arkadasListe.add("Suna");
+    arkadasListe.add("Ali");
+    sp.setStringList("arkadasListe", arkadasListe);
+  }
+
   @override
   Widget build(BuildContext context) {
     var ekranBilgisi = MediaQuery.of(context);
@@ -40,90 +51,31 @@ class _MyHomePageState extends State<MyHomePage> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.title),
+        title: Text("Anasayfa"),
         leading: IconButton(
-          onPressed: () {},
+          onPressed: () {
+            print("deneme");
+            Navigator.push(
+                context, MaterialPageRoute(builder: (context) => MyApp()));
+          },
           icon: Icon(Icons.home),
         ),
       ),
-      body: SingleChildScrollView(
-        child: Column(children: [
-          SizedBox(
-            height: ekranYuksekligi / 2.5,
-            child: Image.asset("images/manti.jpg"),
-          ),
-          Row(
-            children: [
-              Expanded(
-                child: SizedBox(
-                  height: ekranGenisligi / 10,
-                  child: TextButton(
-                    onPressed: () {
-                      print("Beğendim");
-                    },
-                    child: Yazi("Beğen", ekranGenisligi / 25),
-                    style: TextButton.styleFrom(
-                        backgroundColor: Color.fromARGB(255, 185, 43, 43)),
-                  ),
-                ),
-              ),
-              Expanded(
-                child: SizedBox(
-                  height: ekranGenisligi / 10,
-                  child: TextButton(
-                    onPressed: () {
-                      print("Yorum Yapıldı");
-                    },
-                    child: Yazi("Yorum Yap", ekranGenisligi / 25),
-                    style: TextButton.styleFrom(
-                        backgroundColor: Color.fromARGB(255, 129, 29, 62)),
-                  ),
-                ),
-              ),
-            ],
-          ),
-          Padding(
-            padding: EdgeInsets.all(ekranYuksekligi / 100),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  "Mantı - Tülay Gürler Tarifi",
-                  style: TextStyle(
-                    color: Colors.deepOrange,
-                    fontWeight: FontWeight.bold,
-                    fontSize: ekranGenisligi / 25,
-                  ),
-                ),
-                Row(
-                  children: [
-                    Yazi("Izgara Üzerinde Pişirime Uygun", ekranGenisligi / 40),
-                    Spacer(),
-                    Yazi("26 Aralık", ekranGenisligi / 40),
-                  ],
-                )
-              ],
-            ),
-          ),
-          Yazi(
-              "Mantı hamurunuz esnek olursa, içini doldurma ve kapatma kısmında zorlanmazsınız. Hamurunuz çatlamaz ve yırtılmaz. Ayrıca, hamurunuzun kuruyup sertleşmemesi için kapatma işlemini mümkün olduğu kadar hızlı yapmaya çalışmanızı tavsiye ederiz.",
-              ekranGenisligi / 40)
-        ]),
-      ),
-    );
-  }
-}
-
-class Yazi extends StatelessWidget {
-  late String icerik;
-  late double yaziBoyut;
-  Yazi(this.icerik, this.yaziBoyut);
-
-  @override
-  Widget build(BuildContext context) {
-    return Text(
-      icerik,
-      style: TextStyle(fontSize: yaziBoyut),
+      body: Center(
+          child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          ElevatedButton(
+              onPressed: () {
+                veriKaydi();
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => SayfaA()),
+                );
+              },
+              child: Text("geçiş yap"))
+        ],
+      )),
     );
   }
 }
