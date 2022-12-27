@@ -1,5 +1,7 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:path_provider/path_provider.dart';
 
 void main() {
   runApp(const MyApp());
@@ -17,7 +19,11 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.amber,
       ),
-      home: MyHomePage(),
+      home: GestureDetector(
+          onTap: () {
+            FocusManager.instance.primaryFocus?.unfocus();
+          },
+          child: MyHomePage()),
     );
   }
 }
@@ -30,38 +36,80 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  int sayac = 0;
+  var tfgirdi = TextEditingController();
 
-  Future<void> sayacKontrol() async {
-    var sp = await SharedPreferences.getInstance();
+  Future<void> veriYaz() async {
+    var ad = await getApplicationDocumentsDirectory();
+    var uygulamaDosyalamaYolu = await ad.path;
+    var dosya = File("$uygulamaDosyalamaYolu/dosyam.txt");
 
-    sayac = sp.getInt("sayac") ?? 0;
-
-    setState(() {
-      sayac = sayac + 1;
-    });
-
-    sp.setInt("sayac", sayac);
+    dosya.writeAsString(tfgirdi.text);
+    tfgirdi.text = "";
   }
 
-  @override
-  void initState() {
-    sayacKontrol();
-    super.initState();
+  Future<void> veriOku() async {
+    try {
+      var ad = await getApplicationDocumentsDirectory();
+      var uygulamaDosyalamaYolu = await ad.path;
+      var dosya = File("$uygulamaDosyalamaYolu/dosyam.txt");
+      String okunanVeri = await dosya.readAsString();
+      tfgirdi.text = okunanVeri;
+    } catch (e) {
+      e.toString();
+    }
+  }
+
+  Future<void> veriSil() async {
+    var ad = await getApplicationDocumentsDirectory();
+    var uygulamaDosyalamaYolu = await ad.path;
+    var dosya = File("$uygulamaDosyalamaYolu/dosyam.txt");
+
+    if (dosya.existsSync()) {
+      dosya.delete();
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("Deneme"),
+        title: Text("Login Page"),
       ),
       body: Center(
         child: Column(
           children: <Widget>[
-            Text(
-              "Açılış Sayısı : $sayac",
-              style: TextStyle(fontSize: 50),
+            TextField(
+              controller: tfgirdi,
+              decoration: InputDecoration(hintText: "Veri Giriniz"),
+            ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                ElevatedButton(
+                  onPressed: () {
+                    veriYaz();
+                  },
+                  child: Text("Yaz"),
+                ),
+                SizedBox(
+                  width: 5,
+                ),
+                ElevatedButton(
+                  onPressed: () {
+                    veriOku();
+                  },
+                  child: Text("Oku"),
+                ),
+                SizedBox(
+                  width: 5,
+                ),
+                ElevatedButton(
+                  onPressed: () {
+                    veriSil();
+                  },
+                  child: Text("Sil"),
+                ),
+              ],
             )
           ],
           mainAxisAlignment: MainAxisAlignment.center,
